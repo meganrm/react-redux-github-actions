@@ -71,6 +71,7 @@ jobs:
 
   download:
     runs-on: ubuntu-latest
+    needs: [build-development, build-stable]
     steps:
       - uses: actions/checkout@v2
 
