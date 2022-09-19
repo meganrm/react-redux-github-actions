@@ -68,16 +68,11 @@ jobs:
     needs: [build-development, build-stable]
     steps:
       - uses: actions/checkout@v2
-
       - uses: actions/download-artifact@v3
-        with:
-          path: gh-pages
-
       - name: Display structure of downloaded files
         run: ls -R
-      # - name: Deploy
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./dist
-      #     destination_dir: development-head
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages
