@@ -48,22 +48,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
-      - name: Setup node
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{env.NODE_VERSION}}
-      - run: npm ci 
-      - run: npm run build:staging
-      - name: Copy files to staging bucket
-        run: aws s3 sync ./dist/ s3://staging.simularium.allencell.org --delete
-      - name: Clear cloudfront cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CFE_CLOUDFRONT_DISTRIBUTION_ID_STAGING }} --paths "/*"
+      - run: echo "Staging" github.ref
 
   deploy-production:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -73,24 +58,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
-      - name: Setup node
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{env.NODE_VERSION}}
-      - run: npm ci 
-      - run: npm run build
-      - name: Copy files to production bucket
-        run: aws s3 sync ./dist/ s3://production.simularium.allencell.org --delete
-      - name: Clear cloudfront cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CFE_CLOUDFRONT_DISTRIBUTION_ID_PRODUCTION }} --paths "/*"
-      - uses: act10ns/slack@v1
-        with:
-          status: ${{ job.status }}
-          channel: '#simularium-dev'
-        if: always()
+      - run: echo "Production" github.ref
+
