@@ -5,8 +5,6 @@ import * as React from "react";
 
 import { NavigationTab } from "../../constants";
 
-require("style-loader!css-loader!antd/es/tabs/style/index.css");
-
 interface NavTabProps {
     onChange?: (selection: string) => any;
     selectedNavTab?: string;

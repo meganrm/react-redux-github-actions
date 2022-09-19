@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+
 const lessToJs = require("less-vars-to-js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const themeVariables = lessToJs(
@@ -11,12 +12,16 @@ const {
     Env,
     stats
 } = require("./constants");
-const getPluginsByEnv = require('./plugins');
+const getPluginsByEnv = require("./plugins");
 
-module.exports = ({ analyze, env } = {}) => ({
-    devtool: env !== Env.PRODUCTION && 'source-map',
+module.exports = ({
+    analyze,
+    env,
+    dest = "dist"
+} = {}) => ({
+    devtool: env !== Env.PRODUCTION && "source-map",
     devServer: {
-        contentBase: path.join(__dirname, "../", "dist"),
+        contentBase: path.join(__dirname, "../", dest),
         disableHostCheck: true,
         host: devServer.host,
         port: devServer.port,
@@ -25,11 +30,11 @@ module.exports = ({ analyze, env } = {}) => ({
         stats,
     },
     entry: {
-        app: './src/index.tsx'
+        app: "./src/index.tsx",
     },
+    mode: env === Env.PRODUCTION ? "production" : "development",
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.(j|t)sx?/,
                 include: [path.resolve(__dirname, "../", "src")],
                 exclude: /node_modules/,
@@ -37,6 +42,7 @@ module.exports = ({ analyze, env } = {}) => ({
                     loader: "babel-loader"
                 }],
             },
+
             // this rule processes any CSS written for this project and contained in src/
             // it applies PostCSS plugins and converts it to CSS Modules
             {
@@ -44,8 +50,6 @@ module.exports = ({ analyze, env } = {}) => ({
                 include: [
                     path.resolve(__dirname, "../", "src/components"),
                     path.resolve(__dirname, "../", "src/containers"),
-                    path.resolve(__dirname, "../", "src/styles"),
-
                 ],
                 use: [{
                         loader: MiniCssExtractPlugin.loader,
@@ -62,28 +66,38 @@ module.exports = ({ analyze, env } = {}) => ({
                     {
                         loader: "postcss-loader",
                         options: {
+                            ident: "postcss",
+                            plugins: [
+                                require("postcss-flexbugs-fixes"),
+                                require("postcss-preset-env")({
+                                    autoprefixer: {
+                                        flexbox: "no-2009",
+                                    },
+                                }),
+                            ],
                             sourceMap: env !== Env.PRODUCTION,
                         },
                     },
                 ],
             },
+
             // this rule will handle any css imports out of node_modules; it does not apply PostCSS,
             // nor does it convert the imported css to CSS Modules
             // e.g., importing antd component css
-            // {
-            //     test: /\.css/,
-            //     include: [
-            //         path.resolve(__dirname, "../src", "style.css"),
-            //         path.resolve(__dirname, "../", "node_modules"),
-            //     ],
-            //     use: [{
-            //             loader: MiniCssExtractPlugin.loader
-            //         },
-            //         {
-            //             loader: "css-loader"
-            //         },
-            //     ],
-            // }, 
+            {
+                test: /\.css/,
+                include: [
+                    path.resolve(__dirname, "../src", "style.css"),
+                    path.resolve(__dirname, "../", "node_modules"),
+                ],
+                use: [{
+                        loader: MiniCssExtractPlugin.loader
+                    },
+                    {
+                        loader: "css-loader"
+                    },
+                ],
+            },
             {
                 test: /\.less$/,
                 use: [{
@@ -104,7 +118,8 @@ module.exports = ({ analyze, env } = {}) => ({
                         },
                     },
                 ],
-            }, {
+            },
+            {
                 test: /\.(eot|woff|woff2|svg|ttf)([\?]?.*)$/,
                 include: [path.resolve(__dirname, "../src/assets/fonts")],
                 loader: "url-loader",
@@ -112,11 +127,16 @@ module.exports = ({ analyze, env } = {}) => ({
                     name: "[name].[ext]",
                     esModule: false,
                 },
-            }, {
+            },
+            {
                 test: /\.(png|jpg|gif|svg)$/i,
                 use: ["file-loader"],
             },
-        ]
+            {
+                test: /\.md$/,
+                use: ["raw-loader"],
+            },
+        ],
     },
     optimization: {
         runtimeChunk: "single",
@@ -131,11 +151,13 @@ module.exports = ({ analyze, env } = {}) => ({
         },
     },
     output: {
-        path: path.resolve(__dirname, '../', 'dist'),
-        filename: '[name].[chunkhash].js'
+        path: path.resolve(__dirname, "../", dest),
+        filename: "[name].[chunkhash].js",
+        publicPath: process.env.GH_BUILD ? "" : "/",
     },
-    plugins: getPluginsByEnv(env, analyze),
+    plugins: getPluginsByEnv(env, dest, analyze),
     resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
-    }
+        extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+    },
+    stats: analyze ? "none" : stats,
 });
