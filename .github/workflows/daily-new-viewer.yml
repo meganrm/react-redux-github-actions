@@ -71,7 +71,6 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: daily-build
           path: gh-pages
 
       - name: Display structure of downloaded files
