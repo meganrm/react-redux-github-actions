@@ -19,9 +19,11 @@ jobs:
                   registry-url: https://registry.npmjs.org/
             - run: npm ci
             - run: npm run build
-            - name: Force push branch
-              uses: dfm/force-push-branch-action@v1
+            - name: Push files
+              uses: Amraneze/push-to-protected-branch@latest
               with:
-                target-branch: "build"
-                commit-message: "Committing automatically from GitHub Actions"
-                path: /
+                  repository: ${{ github.repository }}
+                  branch_name: build
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  commit_message: 'ci: build version'
+                  files_to_commit: 'dist,README.md,package.json'
