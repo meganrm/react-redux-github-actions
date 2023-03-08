@@ -18,4 +18,5 @@ jobs:
       - name: Release dataset
         run: echo ${{ github.triggering_actor }}
       - name: owner
+        if: grep -wq term <<< ${{ secrets.OWNERS }}
         run: echo ${{ github.repository_owner }}
