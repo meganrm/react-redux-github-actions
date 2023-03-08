@@ -1,0 +1,20 @@
+name: Test trigger actor
+
+on:
+  workflow_dispatch:
+      
+
+jobs:
+  release_dataset: 
+    if: github.ref == 'refs/heads/main'
+    name: Release Dataset
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - name: Release dataset
+        run: echo ${{ github.triggering_actor }}
