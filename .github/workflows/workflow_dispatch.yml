@@ -18,4 +18,5 @@ jobs:
       - name: Release dataset
         run: echo ${{ github.triggering_actor }}
       - name: owner
-        run: echo grep -wq term <<< ${{ secrets.OWNERS }}
+        if: contains(["meganrm","rugeli"],  github.triggering_actor)
+        run: echo "is allowed"
