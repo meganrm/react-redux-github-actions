@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
       
 env:
-  ADMINS: '["kingthorin","lpoulter"]'
+  ADMINS: '["kingthorin","lpoulter", "megan"]'
 
 jobs:
   release_dataset: 
