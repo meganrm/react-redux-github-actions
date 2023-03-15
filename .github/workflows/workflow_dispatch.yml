@@ -18,6 +18,6 @@ jobs:
       - name: Release dataset
         run: echo ${{ github.triggering_actor }}
       - name: owner
-        if: contains('["kingthorin","lpoulter"]', ${{ github.triggering_actor }})
+        if: contains('["kingthorin","lpoulter"]', github.triggering_actor)
         run: echo "is allowed"
         
